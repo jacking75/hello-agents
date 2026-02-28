@@ -127,9 +127,34 @@ class Configuration(BaseModel):
         description="SerpApi 的 API 密钥",
     )
     cors_origins: str = Field(
-        default="http://localhost:5173,http://localhost:3000",
+        default="http://localhost:5173,http://localhost:5174,http://localhost:3000",
         title="CORS 允许的源",
         description="逗号分隔的允许跨域请求的源列表",
+    )
+    host: str = Field(
+        default="0.0.0.0",
+        title="服务器主机",
+        description="FastAPI 服务器监听的主机地址",
+    )
+    port: int = Field(
+        default=8000,
+        title="服务器端口",
+        description="FastAPI 服务器监听的端口",
+    )
+    log_level: str = Field(
+        default="INFO",
+        title="日志级别",
+        description="日志记录级别 (DEBUG, INFO, WARNING, ERROR)",
+    )
+    llm_timeout: int = Field(
+        default=60,
+        title="LLM 超时",
+        description="LLM 请求超时时间（秒）",
+    )
+    tts_timeout: int = Field(
+        default=300,
+        title="TTS 超时",
+        description="TTS 请求超时时间（秒）",
     )
 
     @field_validator("notes_workspace", "audio_output_dir")

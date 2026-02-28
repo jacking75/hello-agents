@@ -267,6 +267,7 @@ def create_app() -> FastAPI:
                         if agent.is_cancelled():
                             logger.info("✅ 本次任务已取消（超时检测）")
                             yield 'data: {"type": "cancelled", "message": "研究任务已被用户取消"}\n\n'
+                            break
                         continue
 
                     # 哨兵：生成器已结束
@@ -306,10 +307,11 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
 
+    _config = Configuration.from_env()
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
-        port=8000,
+        host=_config.host,
+        port=_config.port,
         reload=True,
-        log_level="info"
+        log_level=_config.log_level.lower(),
     )

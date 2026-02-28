@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import threading
 from typing import Any
 
 from hello_agents.tools import SearchTool
@@ -17,18 +18,22 @@ from utils import (
 logger = logging.getLogger(__name__)
 
 MAX_TOKENS_PER_SOURCE = 2000
-_GLOBAL_SEARCH_TOOL = None
+_GLOBAL_SEARCH_TOOL: SearchTool | None = None
+_SEARCH_TOOL_LOCK = threading.Lock()
 
 
 def get_global_search_tool(config: Configuration) -> SearchTool:
-    """使用 API 密钥延迟初始化全局搜索工具。"""
+    """使用 API 密钥延迟初始化全局搜索工具（线程安全）。"""
     global _GLOBAL_SEARCH_TOOL
     if _GLOBAL_SEARCH_TOOL is None:
-        _GLOBAL_SEARCH_TOOL = SearchTool(
-            backend="hybrid",
-            tavily_key=config.tavily_api_key,
-            serpapi_key=config.serpapi_api_key,
-        )
+        with _SEARCH_TOOL_LOCK:
+            # 双重检查锁定，避免多线程重复创建
+            if _GLOBAL_SEARCH_TOOL is None:
+                _GLOBAL_SEARCH_TOOL = SearchTool(
+                    backend="hybrid",
+                    tavily_key=config.tavily_api_key,
+                    serpapi_key=config.serpapi_api_key,
+                )
     return _GLOBAL_SEARCH_TOOL
 
 

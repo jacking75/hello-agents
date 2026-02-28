@@ -164,7 +164,7 @@ class AudioGenerationService:
         try:
             logger.debug("Calling TTS API for voice %s: %s...", voice, text[:20])
             # Use configurable timeout if available; default to 300 seconds for robustness.
-            timeout = getattr(self._config, "tts_timeout", 300)
+            timeout = self._config.tts_timeout
             response = requests.post(
                 self._config.tts_base_url,
                 json=payload,
